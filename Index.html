@@ -1,0 +1,2622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNA License Training Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+        .hidden { display: none !important; }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #059669; color: white; }
+        .btn-primary:hover { background: #047857; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+        .btn-success { background: #059669; color: white; }
+        .btn-success:hover { background: #047857; }
+        .btn-warning { background: #d97706; color: white; }
+        .btn-warning:hover { background: #b45309; }
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        .lesson-card {
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .lesson-card:hover {
+            border-color: #059669;
+            background: #ecfdf5;
+        }
+        .lesson-card.completed {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+        .module-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 9999px;
+            height: 0.5rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #10b981;
+            height: 100%;
+            transition: width 0.3s;
+        }
+        .competency-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-basic { background: #dbeafe; color: #1e40af; }
+        .badge-skills { background: #fef3c7; color: #92400e; }
+        .badge-clinical { background: #fecaca; color: #991b1b; }
+        .badge-ethics { background: #e0e7ff; color: #3730a3; }
+        .badge-communication { background: #f3e8ff; color: #6b21a8; }
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover {
+            background: #f3f4f6;
+            border-color: #059669;
+        }
+        .quiz-option.selected {
+            background: #ecfdf5;
+            border-color: #059669;
+        }
+        .quiz-option.correct {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+        .quiz-option.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+        .quiz-feedback {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .correct-feedback {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .incorrect-feedback {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .notification-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        .notification-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        .notification-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+        .notification-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        .close-notification {
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-modal {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .skills-checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .skills-checklist-item:hover {
+            background-color: #f9fafb;
+        }
+        .study-guide-item {
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .study-guide-item:hover {
+            background-color: #f9fafb;
+            border-color: #059669;
+        }
+        .student-progress-item {
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .student-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .student-progress-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .student-progress-program {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        .student-progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .student-progress-fill {
+            height: 100%;
+            background-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Loading message -->
+    <div id="loading" class="flex items-center justify-center min-h-screen">
+        <div class="text-xl text-gray-600">Loading CNA Training Portal...</div>
+    </div>
+    
+    <!-- Login Screen -->
+    <div id="loginScreen" class="hidden min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+        <div class="card w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-green-600 text-2xl">🏥</span>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">CNA License Training</h1>
+                <h2 class="text-xl text-gray-600">Certified Nursing Assistant Preparation</h2>
+            </div>
+            <div class="flex mb-6 bg-gray-100 rounded-lg p-1">
+                <button id="studentTab" class="flex-1 py-2 px-4 rounded-md bg-white shadow-sm text-green-600">Student Login</button>
+                <button id="instructorTab" class="flex-1 py-2 px-4 rounded-md text-gray-600">Instructor Login</button>
+            </div>
+            <div id="studentForm">
+                <input type="text" id="studentName" class="input" placeholder="Enter your name">
+                <select id="studentProgram" class="input">
+                    <option value="Pre-License">Pre-License Training</option>
+                    <option value="Exam-Prep">Exam Preparation</option>
+                    <option value="Refresher">Skills Refresher</option>
+                    <option value="Continuing-Ed">Continuing Education</option>
+                </select>
+            </div>
+            <div id="instructorForm" class="hidden">
+                <input type="password" id="instructorCode" class="input" placeholder="Enter instructor code">
+            </div>
+            <button id="loginBtn" class="btn btn-primary w-full mt-6">Begin Training</button>
+            
+            <div class="mt-6 text-center text-sm text-gray-600">
+                <p>✓ State Board Approved Curriculum</p>
+                <p>✓ Interactive Clinical Scenarios</p>
+                <p>✓ Skills Competency Testing</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div id="navigation" class="hidden bg-white shadow-sm border-b">
+        <div class="max-w-6xl mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-green-600 text-xl">🏥</span>
+                        <h1 class="text-xl font-bold text-gray-900">CNA License Training</h1>
+                    </div>
+                    <span class="text-gray-500">|</span>
+                    <span id="userInfo" class="text-gray-600"></span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-gray-600">
+                        Progress: <span id="progressPercent">0%</span>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-100">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="hidden p-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Progress Overview -->
+            <div class="card mb-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">CNA Training Progress</h2>
+                        <p class="text-gray-600">Master the core competencies for your CNA license</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-green-600" id="completionRate">0%</div>
+                        <div class="text-gray-500">Complete</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div class="mt-4 grid md:grid-cols-4 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-bold text-blue-600" id="totalLessons">10</div>
+                        <div class="text-sm text-gray-600">Total Lessons</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-green-600" id="completedCount">0</div>
+                        <div class="text-sm text-gray-600">Completed</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-yellow-600" id="skillsCount">0</div>
+                        <div class="text-sm text-gray-600">Skills Mastered</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-purple-600" id="examReady">No</div>
+                        <div class="text-sm text-gray-600">Exam Ready</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Core Competency Areas -->
+            <!-- Basic Nursing Skills -->
+            <div class="module-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Basic Nursing Skills</h3>
+                    <span class="competency-badge badge-basic">Core Competency</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="lesson-card" onclick="startLesson(1)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Vital Signs Assessment</h4>
+                            <span id="lesson1-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Learn proper technique for measuring temperature, pulse, respiration, and blood pressure</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">15 min</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="startLesson(2)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Hand Hygiene & Infection Control</h4>
+                            <span id="lesson2-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Master proper handwashing, PPE use, and standard precautions</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">12 min</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="startLesson(3)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Safe Patient Transfer</h4>
+                            <span id="lesson3-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Learn body mechanics and techniques for moving patients safely</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">18 min</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="startLesson(4)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Positioning & Comfort Care</h4>
+                            <span id="lesson4-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Proper positioning techniques to prevent pressure sores and ensure comfort</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">16 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Personal Care Skills -->
+            <div class="module-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Personal Care Skills</h3>
+                    <span class="competency-badge badge-skills">Hands-On Skills</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="lesson-card" onclick="startLesson(5)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Bathing & Personal Hygiene</h4>
+                            <span id="lesson5-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Bed baths, shower assistance, oral care, and grooming</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">20 min</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="startLesson(6)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Toileting & Elimination</h4>
+                            <span id="lesson6-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Assist with toileting, catheter care, and maintaining dignity</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">14 min</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="startLesson(7)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Dressing & Grooming</h4>
+                            <span id="lesson7-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Assist patients with clothing and personal appearance</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">12 min</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="startLesson(8)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Feeding & Nutrition</h4>
+                            <span id="lesson8-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Assist with meals and recognize nutritional needs</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">16 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Communication & Ethics -->
+            <div class="module-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Communication & Ethics</h3>
+                    <span class="competency-badge badge-communication">Soft Skills</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="lesson-card" onclick="startLesson(9)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Therapeutic Communication</h4>
+                            <span id="lesson9-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Effective communication with patients, families, and healthcare team</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">14 min</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="startLesson(10)">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">Patient Rights & Privacy</h4>
+                            <span id="lesson10-check" class="hidden text-green-500 text-xl">✓</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">HIPAA compliance, confidentiality, and respecting patient rights</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 text-sm">▶ Start Training</span>
+                            <span class="text-xs text-gray-500">13 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="grid md:grid-cols-3 gap-6 mt-8">
+                <div class="card text-center cursor-pointer hover:shadow-xl transition-all" onclick="showPracticeExam()">
+                    <div class="text-4xl mb-4">📝</div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Practice Exam</h3>
+                    <p class="text-gray-600">Test your knowledge with CNA exam questions</p>
+                </div>
+                <div class="card text-center cursor-pointer hover:shadow-xl transition-all" onclick="showSkillsChecklist()">
+                    <div class="text-4xl mb-4">✅</div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Skills Checklist</h3>
+                    <p class="text-gray-600">Track your hands-on competencies</p>
+                </div>
+                <div class="card text-center cursor-pointer hover:shadow-xl transition-all" onclick="showStudyGuides()">
+                    <div class="text-4xl mb-4">📚</div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Study Guides</h3>
+                    <p class="text-gray-600">Review materials and quick references</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Instructor Dashboard -->
+    <div id="instructorDashboard" class="hidden p-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="card mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">CNA Training Management</h2>
+                <p class="text-gray-600">Monitor student progress and manage curriculum content</p>
+            </div>
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-blue-600">10</div>
+                    <div class="text-gray-600">Active Lessons</div>
+                </div>
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-green-600" id="totalStudents">0</div>
+                    <div class="text-gray-600">Students Enrolled</div>
+                </div>
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-yellow-600" id="avgCompletion">0%</div>
+                    <div class="text-gray-600">Avg. Completion</div>
+                </div>
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-purple-600" id="passRate">0%</div>
+                    <div class="text-gray-600">Pass Rate</div>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card cursor-pointer hover:shadow-xl transition-all" onclick="manageLessons()">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <span class="text-blue-600 text-2xl">📚</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Manage Curriculum</h3>
+                            <p class="text-gray-600">Edit lessons and competencies</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card cursor-pointer hover:shadow-xl transition-all" onclick="viewReports()">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <span class="text-green-600 text-2xl">📊</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Student Progress</h3>
+                            <p class="text-gray-600">Track individual performance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lesson View -->
+    <div id="lessonView" class="hidden p-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="card">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span id="lessonBadge" class="competency-badge badge-basic"></span>
+                            <span class="text-gray-500">•</span>
+                            <span id="lessonDuration" class="text-gray-500 text-sm"></span>
+                        </div>
+                        <h2 id="lessonTitle" class="text-2xl font-bold text-gray-900"></h2>
+                    </div>
+                    <button onclick="closeLesson()" class="text-gray-500 hover:text-gray-700">← Back to Dashboard</button>
+                </div>
+                <!-- Lesson Content -->
+                <div id="lessonContent"></div>
+                <!-- Navigation Buttons -->
+                <div id="lessonNav" class="mt-6 flex gap-4">
+                    <button id="nextBtn" onclick="nextStep()" class="btn btn-primary">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Practice Exam Modal -->
+    <div id="practiceExamModal" class="hidden modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('practiceExamModal')">&times;</span>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">CNA Practice Exam</h2>
+            <div id="practiceExamContent">
+                <p class="mb-4">This practice exam contains 10 questions covering all CNA competency areas. You will have 30 minutes to complete it.</p>
+                <div class="flex justify-between mb-4">
+                    <div>
+                        <span class="font-medium">Questions:</span> 10
+                    </div>
+                    <div>
+                        <span class="font-medium">Time Limit:</span> 30 minutes
+                    </div>
+                </div>
+                <button onclick="startPracticeExam()" class="btn btn-primary w-full">Start Practice Exam</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Skills Checklist Modal -->
+    <div id="skillsChecklistModal" class="hidden modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('skillsChecklistModal')">&times;</span>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">CNA Skills Checklist</h2>
+            <div id="skillsChecklistContent">
+                <p class="mb-4">Track your hands-on competencies. Check off skills as you master them.</p>
+                <div id="skillsList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Study Guides Modal -->
+    <div id="studyGuidesModal" class="hidden modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('studyGuidesModal')">&times;</span>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">CNA Study Guides</h2>
+            <div id="studyGuidesContent">
+                <p class="mb-4">Review materials and quick references for your CNA exam preparation.</p>
+                <div id="studyGuidesList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manage Lessons Modal -->
+    <div id="manageLessonsModal" class="hidden modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('manageLessonsModal')">&times;</span>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Manage Curriculum</h2>
+            <div id="manageLessonsContent">
+                <p class="mb-4">Edit lessons and competencies in the CNA training curriculum.</p>
+                <div id="lessonsList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Student Reports Modal -->
+    <div id="studentReportsModal" class="hidden modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('studentReportsModal')">&times;</span>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Student Progress Reports</h2>
+            <div id="studentReportsContent">
+                <p class="mb-4">Track individual student performance and progress.</p>
+                <div id="studentsList"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // CNA-specific lesson data
+        const cnaLessons = {
+            1: {
+                title: "Vital Signs Assessment",
+                competency: "Basic Nursing Skills",
+                duration: "15 min",
+                badge: "badge-basic",
+                concept: "Accurate vital signs assessment is fundamental to patient care and provides critical information about a patient's physiological status. As a CNA, you must master proper technique and recognize normal vs. abnormal values.",
+                scenario: "Mrs. Johnson, 78, is complaining of feeling dizzy and weak. The nurse asks you to obtain a complete set of vital signs before her medication is administered. You notice she appears pale and is sitting on the edge of her bed.",
+                scriptedAnswer: "I would introduce myself, explain what I'm going to do, and ensure privacy. I'd start with temperature using a clean thermometer, then check pulse at the radial artery for a full minute, count respirations when the patient is unaware, and take blood pressure on the appropriate arm. I would document immediately and report any abnormal findings to the nurse.",
+                quizQuestions: [
+                    {
+                        question: "What are the normal ranges for adult vital signs?",
+                        options: [
+                            "Temperature: 97.6-99.6°F, Pulse: 60-100 bpm, Respirations: 12-20/min, BP: <120/80",
+                            "Temperature: 96.6-98.6°F, Pulse: 50-90 bpm, Respirations: 10-18/min, BP: <130/85",
+                            "Temperature: 98.6-100.6°F, Pulse: 70-110 bpm, Respirations: 14-22/min, BP: <140/90",
+                            "Temperature: 97.0-99.0°F, Pulse: 60-100 bpm, Respirations: 16-24/min, BP: <125/82"
+                        ],
+                        correctAnswer: 0,
+                        explanation: "The standard normal ranges for adult vital signs are: Temperature 97.6-99.6°F, Pulse 60-100 bpm, Respirations 12-20 per minute, and Blood Pressure less than 120/80 mmHg."
+                    },
+                    {
+                        question: "Which vital sign should be checked first when assessing a patient?",
+                        options: [
+                            "Blood pressure",
+                            "Temperature",
+                            "Pulse",
+                            "Respirations"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Temperature is typically checked first as it can be affected by recent activity, eating, or drinking. The other vital signs should then be checked in a systematic order."
+                    },
+                    {
+                        question: "When taking blood pressure, where should the patient's arm be positioned?",
+                        options: [
+                            "Above heart level",
+                            "At heart level",
+                            "Below heart level",
+                            "Position doesn't matter as long as it's comfortable"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "The patient's arm should be positioned at heart level to ensure an accurate blood pressure reading. Arm position above or below heart level can falsely lower or raise the reading."
+                    },
+                    {
+                        question: "How long should you count respirations to get an accurate rate?",
+                        options: [
+                            "15 seconds",
+                            "30 seconds",
+                            "60 seconds",
+                            "30 seconds and multiply by 2"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Respirations should be counted for a full 60 seconds for the most accurate reading, especially if the patient's breathing is irregular. Counting for shorter periods can miss irregularities."
+                    },
+                    {
+                        question: "Which of the following would require immediate reporting to the nurse?",
+                        options: [
+                            "Temperature of 99.0°F",
+                            "Blood pressure of 118/76",
+                            "Pulse rate of 55 bpm",
+                            "Respiratory rate of 18"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "A pulse rate of 55 bpm (bradycardia) is below the normal range of 60-100 bpm and should be reported immediately. The other values are within normal ranges."
+                    }
+                ],
+                clinicalTips: "Always use appropriate cuff size, ensure equipment is calibrated, and never guess at values. When in doubt, ask another CNA or nurse to double-check your findings.",
+                competencySkills: ["Proper thermometer use", "Palpating pulse points", "Recognizing abnormal findings", "Accurate documentation"]
+            },
+            2: {
+                title: "Hand Hygiene & Infection Control",
+                competency: "Basic Nursing Skills", 
+                duration: "12 min",
+                badge: "badge-basic",
+                concept: "Hand hygiene is the single most effective way to prevent healthcare-associated infections. As a CNA, you are the first line of defense against the spread of pathogens in healthcare settings.",
+                scenario: "You've just finished helping Mr. Rodriguez with toileting and need to assist Mrs. Chen with her meal. There's no sink immediately available in the hallway, but you see an alcohol-based hand sanitizer dispenser.",
+                scriptedAnswer: "After toileting assistance, I must wash my hands with soap and water at the nearest sink because alcohol-based sanitizers are not effective against C. diff spores that may be present. I would remove gloves properly, wash hands for at least 20 seconds, dry thoroughly, then apply new gloves before assisting Mrs. Chen with her meal.",
+                quizQuestions: [
+                    {
+                        question: "For how long should you wash your hands with soap and water?",
+                        options: [
+                            "10 seconds",
+                            "15 seconds",
+                            "20 seconds",
+                            "30 seconds"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "The CDC recommends washing hands with soap and water for at least 20 seconds to effectively remove pathogens and prevent infection transmission."
+                    },
+                    {
+                        question: "When should you use soap and water instead of alcohol-based hand sanitizer?",
+                        options: [
+                            "Before eating",
+                            "After touching a doorknob",
+                            "After caring for a patient with C. diff",
+                            "Before taking vital signs"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Soap and water should be used instead of alcohol-based sanitizer when caring for patients with Clostridioides difficile (C. diff) because alcohol-based sanitizers do not effectively kill C. diff spores."
+                    },
+                    {
+                        question: "What is the most important step in proper hand hygiene?",
+                        options: [
+                            "Using hot water",
+                            "Using antibacterial soap",
+                            "Friction between all surfaces of the hands",
+                            "Drying hands thoroughly"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Friction between all surfaces of the hands is the most important step in hand hygiene. The mechanical action of rubbing hands together helps remove pathogens."
+                    },
+                    {
+                        question: "Which of the following is a standard precaution for infection control?",
+                        options: [
+                            "Wearing gloves only when you see blood",
+                            "Wearing a mask only with patients who have known infections",
+                            "Hand hygiene before and after patient contact",
+                            "Using hand sanitizer instead of soap and water for all situations"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Hand hygiene before and after patient contact is a standard precaution that should be followed with all patients regardless of their infection status."
+                    },
+                    {
+                        question: "When removing PPE, in what order should you remove items?",
+                        options: [
+                            "Gloves first, then gown, then mask, then eye protection",
+                            "Gown first, then gloves, then mask, then eye protection",
+                    "Mask first, then eye protection, then gown, then gloves",
+                    "Eye protection first, then mask, then gown, then gloves"
+                        ],
+                        correctAnswer: 0,
+                        explanation: "The proper order for removing PPE is: gloves first, then gown, then eye protection (if worn), then mask. This sequence minimizes contamination of clean areas."
+                    },
+                ],
+                clinicalTips: "Artificial nails and chipped nail polish harbor bacteria. Keep nails short and clean. Remove jewelry that can harbor pathogens.",
+                competencySkills: ["Proper handwashing technique", "Appropriate use of PPE", "Understanding transmission routes", "Standard precautions application"]
+            },
+            3: {
+                title: "Safe Patient Transfer",
+                competency: "Basic Nursing Skills",
+                duration: "18 min", 
+                badge: "badge-basic",
+                concept: "Safe patient transfers prevent injury to both patient and caregiver. Proper body mechanics and transfer techniques are essential skills that protect everyone involved in patient care.",
+                scenario: "Mr. Thompson, a 180-lb stroke patient with left-side weakness, needs to transfer from his bed to a wheelchair for physical therapy. He can bear some weight on his right side but needs significant assistance.",
+                scriptedAnswer: "I would first assess Mr. Thompson's ability and explain the transfer. I'd position the wheelchair at a 45-degree angle to the bed, lock the wheels, and remove footrests. Using proper body mechanics, I'd help him sit on the edge of the bed, ensure he's stable, then assist him to stand using his strong side while supporting his weak side. I'd pivot slowly and help him sit in the wheelchair, ensuring proper positioning.",
+                quizQuestions: [
+                    {
+                        question: "What is the correct position for a wheelchair when transferring a patient from a bed?",
+                        options: [
+                            "Parallel to the bed",
+                            "At a 45-degree angle to the bed",
+                            "At a 90-degree angle to the bed",
+                            "Facing away from the bed"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Positioning the wheelchair at a 45-degree angle to the bed allows for a natural pivot movement during transfer, making the process safer and more efficient."
+                    },
+                    {
+                        question: "Which body mechanic principle is most important when transferring patients?",
+                        options: [
+                            "Keep your back straight and bend at the waist",
+                            "Keep the load close to your body",
+                            "Lift primarily with your back muscles",
+                            "Twist at the waist while moving"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Keeping the load close to your body maintains your center of gravity and reduces strain on your back, which is a key principle of proper body mechanics."
+                    },
+                    {
+                        question: "When should you use a mechanical lift instead of a manual transfer?",
+                        options: [
+                            "When the patient weighs over 100 pounds",
+                            "When the patient can bear some weight",
+                    "When the patient cannot assist with the transfer",
+                    "When transferring from bed to chair"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "A mechanical lift should be used when the patient cannot assist with the transfer, regardless of weight, to ensure safety for both patient and caregiver."
+                    },
+                    {
+                        question: "What should you do before attempting to transfer a patient?",
+                        options: [
+                            "Lock the wheels on the wheelchair and bed",
+                            "Raise the bed to its highest position",
+                            "Remove all patient clothing",
+                            "Have the patient fold their arms"
+                        ],
+                        correctAnswer: 0,
+                        explanation: "Locking the wheels on the wheelchair and bed is a critical safety step before any transfer to prevent equipment movement that could cause falls."
+                    },
+                    {
+                        question: "When assisting a patient with left-sided weakness to stand, where should you position yourself?",
+                        options: [
+                            "On the patient's left side",
+                            "On the patient's right side",
+                            "Directly in front of the patient",
+                            "Behind the patient"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "You should position yourself on the patient's strong side (right side in this case) to provide support while allowing them to use their stronger side to assist with the transfer."
+                    }
+                ],
+                clinicalTips: "Always explain what you're doing, move slowly, watch for signs of dizziness or fatigue, and never rush a transfer.",
+                competencySkills: ["Body mechanics principles", "Transfer techniques", "Equipment safety checks", "Patient assessment before transfer"]
+            },
+            4: {
+                title: "Positioning & Comfort Care",
+                competency: "Basic Nursing Skills",
+                duration: "16 min",
+                badge: "badge-basic", 
+                concept: "Proper positioning prevents pressure ulcers, maintains circulation, and ensures patient comfort. Understanding different positions and their purposes is crucial for quality patient care.",
+                scenario: "Mrs. Garcia has been on bedrest for 3 days after hip surgery. You notice redness on her tailbone area during your shift. She needs to be repositioned but complains of pain when moved.",
+                scriptedAnswer: "I would assess the redness (stage 1 pressure ulcer risk), document findings, and report to the nurse immediately. I'd reposition her off the affected area using pillows for support, ensure proper alignment, and implement a turning schedule every 2 hours. I'd use gentle techniques, explain each movement, and provide pain management comfort measures as ordered.",
+                quizQuestions: [
+                    {
+                        question: "How often should bedridden patients be repositioned?",
+                        options: [
+                            "Every 30 minutes",
+                            "Every 1 hour",
+                            "Every 2 hours",
+                            "Every 4 hours"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Bedridden patients should be repositioned at least every 2 hours to prevent pressure ulcers and maintain circulation. Patients in wheelchairs should be repositioned every 15-30 minutes."
+                    },
+                    {
+                        question: "Which of the following is a common pressure point for developing pressure ulcers?",
+                        options: [
+                            "Forehead",
+                            "Palms of hands",
+                            "Soles of feet",
+                            "Tailbone (sacrum)"
+                        ],
+                        correctAnswer: 3,
+                        explanation: "The tailbone (sacrum) is a common pressure point for developing pressure ulcers, along with heels, hips, elbows, and shoulder blades."
+                    },
+                    {
+                        question: "What is the first sign of a Stage 1 pressure ulcer?",
+                        options: [
+                            "Open wound with visible subcutaneous tissue",
+                            "Partial thickness skin loss",
+                            "Intact skin with non-blanchable redness",
+                            "Full thickness tissue loss"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "A Stage 1 pressure ulcer presents as intact skin with non-blanchable redness. The area may be painful, firm, soft, warmer, or cooler compared to adjacent tissue."
+                    },
+                    {
+                        question: "Which positioning device is most effective for preventing heel pressure ulcers?",
+                        options: [
+                            "Pillow under the knees",
+                            "Heel suspension boot",
+                            "Extra blanket over feet",
+                            "Elevating the foot of the bed"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "A heel suspension boot or pillow specifically placed to elevate the heel off the bed surface is most effective for preventing heel pressure ulcers by completely relieving pressure."
+                    },
+                    {
+                        question: "When positioning a patient in Fowler's position, what is the correct angle of the head of the bed?",
+                        options: [
+                            "15-30 degrees",
+                            "30-45 degrees",
+                            "45-60 degrees",
+                            "60-90 degrees"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Standard Fowler's position has the head of the bed raised to 45-60 degrees. Semi-Fowler's is 30-45 degrees, and High Fowler's is 60-90 degrees."
+                    }
+                ],
+                clinicalTips: "Keep skin clean and dry, use moisturizers, avoid massage over bony prominences, and check skin during each repositioning.",
+                competencySkills: ["Pressure ulcer prevention", "Positioning techniques", "Skin assessment", "Comfort measures"]
+            },
+            5: {
+                title: "Bathing & Personal Hygiene", 
+                competency: "Personal Care Skills",
+                duration: "20 min",
+                badge: "badge-skills",
+                concept: "Personal hygiene maintains dignity, prevents infection, and promotes comfort. Bathing techniques must be adapted to each patient's condition and mobility level while maintaining privacy and respect.",
+                scenario: "Mr. Kim is a 65-year-old diabetic patient who is embarrassed about needing help with bathing. He has limited mobility due to a recent amputation and seems withdrawn during care.",
+                scriptedAnswer: "I would approach Mr. Kim with sensitivity, explaining that needing help is normal and temporary. I'd ensure privacy by closing doors and curtains, maintain his dignity by only exposing areas being washed, use warm water and gentle techniques, and engage in therapeutic conversation to help him feel comfortable. I'd pay special attention to his residual limb care and diabetic foot care.",
+                quizQuestions: [
+                    {
+                        question: "What is the correct water temperature for a patient bath?",
+                        options: [
+                            "90-95°F (32-35°C)",
+                            "100-105°F (38-41°C)",
+                            "110-115°F (43-46°C)",
+                            "120°F (49°C) or higher"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "The correct water temperature for a patient bath is 100-105°F (38-41°C). This is warm enough for cleaning but not hot enough to cause burns or discomfort."
+                    },
+                    {
+                        question: "When giving a bed bath, in what sequence should you wash the patient?",
+                        options: [
+                            "Start with the feet and work upward",
+                            "Start with the face and work downward",
+                            "Start with the back and end with the face",
+                            "Wash all areas randomly"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "When giving a bed bath, you should start with the face and work downward, moving from cleanest to dirtiest areas. This prevents cross-contamination."
+                    },
+                    {
+                        question: "What special consideration is needed when bathing a diabetic patient?",
+                        options: [
+                            "Use very hot water to improve circulation",
+                            "Avoid washing the feet",
+                            "Check water temperature carefully and inspect feet for wounds",
+                            "Use alcohol-based products for better cleaning"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Diabetic patients often have decreased sensation in their feet, so water temperature must be checked carefully and feet should be inspected for any wounds or changes during bathing."
+                    },
+                    {
+                        question: "What is the most important aspect of maintaining patient dignity during personal care?",
+                        options: [
+                            "Completing the bath as quickly as possible",
+                            "Providing privacy and exposing only the area being washed",
+                            "Using the strongest soap available",
+                            "Bathing the patient without talking to them"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Maintaining patient dignity during personal care primarily involves providing privacy and exposing only the area being washed at any given time."
+                    },
+                    {
+                        question: "How should you care for a patient's residual limb after amputation?",
+                        options: [
+                            "Keep it tightly wrapped at all times",
+                            "Wash gently with mild soap, dry thoroughly, and inspect for skin breakdown",
+                            "Avoid getting it wet",
+                            "Apply alcohol to toughen the skin"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Residual limb care involves washing gently with mild soap, drying thoroughly (especially in skin folds), and inspecting for skin breakdown or irritation. Proper care prevents infection and skin problems."
+                    }
+                ],
+                clinicalTips: "Always test water temperature on your wrist, gather all supplies first, and work quickly but gently to prevent chilling.",
+                competencySkills: ["Bed bath technique", "Shower assistance", "Perineal care", "Cultural sensitivity"]
+            },
+            6: {
+                title: "Toileting & Elimination",
+                competency: "Personal Care Skills",
+                duration: "14 min",
+                badge: "badge-skills",
+                concept: "Assisting with elimination needs requires sensitivity, dignity preservation, and infection control. CNAs must understand normal elimination patterns and recognize abnormalities.",
+                scenario: "Mr. Davis, a 72-year-old with Parkinson's disease, needs assistance using the bedside commode. He has difficulty with mobility and is concerned about having an accident.",
+                scriptedAnswer: "I would approach Mr. Davis with reassurance, explain the process, and ensure privacy. I'd position the commode securely, assist him with transferring using proper body mechanics, and stay nearby as needed. After elimination, I'd provide perineal care, assist with handwashing, and help him back to bed. I'd document output and any abnormalities.",
+                quizQuestions: [
+                    {
+                        question: "What is the normal color of urine?",
+                        options: [
+                            "Clear to pale yellow",
+                            "Dark brown",
+                            "Bright red",
+                            "Blue or green"
+                        ],
+                        correctAnswer: 0,
+                        explanation: "Normal urine color ranges from clear to pale yellow or amber. Unusual colors like dark brown, red, or blue/green may indicate medical issues that should be reported."
+                    },
+                    {
+                        question: "How should you measure urinary output for a patient with a catheter?",
+                        options: [
+                            "Estimate based on the size of the drainage bag",
+                            "Empty the drainage bag into a graduated container and record the amount",
+                            "Count the number of times the patient voids",
+                            "Weigh the patient before and after voiding"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Urinary output for a catheterized patient should be measured by emptying the drainage bag into a graduated container to get an accurate measurement, which should then be recorded."
+                    },
+                    {
+                        question: "What is the proper technique for perineal care?",
+                        options: [
+                            "Wipe from back to front",
+                            "Wipe from front to back",
+                            "Use circular motions",
+                            "Use alcohol for better cleaning"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Proper perineal care technique is to wipe from front to back to prevent contamination of the urethra and vaginal area with bacteria from the anal region."
+                    },
+                    {
+                        question: "How often should a bedpan be offered to a patient?",
+                        options: [
+                            "Only when the patient requests it",
+                            "Every 8-12 hours",
+                            "Every 2-4 hours or as needed",
+                            "Only once per day"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Bedpans should be offered every 2-4 hours or as needed based on the patient's normal elimination patterns and fluid intake."
+                    },
+                    {
+                        question: "What is a sign of constipation that should be reported?",
+                        options: [
+                            "Bowel movement once per day",
+                            "Straining during bowel movements",
+                            "No bowel movement for 3 days",
+                            "Soft, formed stools"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "No bowel movement for 3 days or more is considered constipation and should be reported, especially if accompanied by other symptoms like abdominal pain or distension."
+                    }
+                ],
+                clinicalTips: "Always wear gloves when assisting with elimination, maintain privacy, and be sensitive to the embarrassment patients may feel. Never rush the process.",
+                competencySkills: ["Perineal care techniques", "Catheter care", "Assistive device use", "Infection prevention"]
+            },
+            7: {
+                title: "Dressing & Grooming",
+                competency: "Personal Care Skills",
+                duration: "12 min",
+                badge: "badge-skills",
+                concept: "Assisting with dressing and grooming helps maintain patient dignity and self-esteem. Adaptation to patient limitations while promoting independence is key.",
+                scenario: "Mrs. Patel, who had a stroke with right-sided paralysis, needs to get dressed for a family visit. She's frustrated that she can't dress herself as she used to.",
+                scriptedAnswer: "I would approach Mrs. Patel with empathy, acknowledging her frustration while encouraging her to do what she can. I'd lay out clothes in the order they're put on, have her sit on the edge of the bed, and dress her affected side first. I'd encourage her to use her unaffected hand to help as much as possible, and provide grooming assistance while focusing on her appearance to boost her morale.",
+                quizQuestions: [
+                    {
+                        question: "When dressing a patient with one-sided weakness, which side should be dressed first?",
+                        options: [
+                            "The strong side",
+                            "The weak side",
+                            "It doesn't matter which side first",
+                            "Only the patient should dress themselves"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "When dressing a patient with one-sided weakness, you should dress the weak side first. When undressing, remove clothing from the strong side first."
+                    },
+                    {
+                        question: "What type of clothing is most appropriate for a patient with limited mobility?",
+                        options: [
+                            "Tight-fitting clothes to prevent shifting",
+                            "Clothing with many small buttons",
+                            "Front-opening clothes with Velcro or large buttons",
+                            "One-piece jumpsuits"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Front-opening clothes with Velcro or large buttons are most appropriate for patients with limited mobility as they are easier to put on and remove."
+                    },
+                    {
+                        question: "How can you best promote independence during dressing?",
+                        options: [
+                            "Dress the patient completely to save time",
+                            "Break the task into small steps and encourage the patient to do what they can",
+                            "Only dress the patient when they're fully alert",
+                            "Wait until the patient asks for help"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Promoting independence involves breaking the dressing task into small, manageable steps and encouraging the patient to do as much as they can for themselves."
+                    },
+                    {
+                        question: "What is the most important consideration when grooming a patient?",
+                        options: [
+                            "Speed of completing the task",
+                            "The patient's personal preferences and routine",
+                            "Using the most expensive products",
+                            "Following a strict sequence regardless of patient preference"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "The most important consideration when grooming a patient is respecting their personal preferences and established routine, as this maintains dignity and sense of control."
+                    },
+                    {
+                        question: "How should you position a patient for nail care?",
+                        options: [
+                            "Standing up",
+                            "Lying flat on their back",
+                            "In a comfortable sitting position with good lighting",
+                            "In a dark room to prevent anxiety"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "For nail care, the patient should be in a comfortable sitting position with good lighting to ensure you can see clearly and the patient is comfortable throughout the procedure."
+                    }
+                ],
+                clinicalTips: "Always consider the patient's personal preferences, cultural background, and routine. Clothing should be appropriate for the weather and occasion.",
+                competencySkills: ["Adaptive dressing techniques", "Grooming assistance", "Promoting independence", "Cultural sensitivity"]
+            },
+            8: {
+                title: "Feeding & Nutrition",
+                competency: "Personal Care Skills",
+                duration: "16 min",
+                badge: "badge-skills",
+                concept: "Proper nutrition is essential for healing and health. CNAs must understand special diets, feeding techniques, and how to identify swallowing difficulties.",
+                scenario: "Mr. Wilson, 85, has dysphagia (difficulty swallowing) following a stroke. He's on a pureed diet with nectar-thick liquids and becomes frustrated during mealtimes.",
+                scriptedAnswer: "I would ensure Mr. Wilson is sitting upright at 90 degrees, verify his diet order, and prepare his food appropriately. I'd feed him slowly, allowing time to chew and swallow between bites, and verify each swallow is complete before offering more. I'd offer thickened liquids between bites and maintain a pleasant conversation to reduce anxiety. I'd document intake and any difficulties.",
+                quizQuestions: [
+                    {
+                        question: "What position should a patient be in for eating?",
+                        options: [
+                            "Lying flat in bed",
+                            "Semi-reclined at 30 degrees",
+                            "Upright at 90 degrees with head slightly forward",
+                            "Standing up"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Patients should be positioned upright at 90 degrees with head slightly forward (chin-tuck position) for eating to facilitate safe swallowing and prevent aspiration."
+                    },
+                    {
+                        question: "Which of the following is a sign of dysphagia (difficulty swallowing)?",
+                        options: [
+                            "Eating meals quickly",
+                            "Coughing or choking during meals",
+                            "Requesting extra seasoning",
+                            "Drinking large amounts of water"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Coughing or choking during meals is a common sign of dysphagia. Other signs include wet-sounding voice, pocketing food, and unexplained weight loss."
+                    },
+                    {
+                        question: "What is the correct feeding technique?",
+                        options: [
+                            "Offer large bites to finish quickly",
+                            "Feed at the patient's preferred pace with small bites",
+                            "Alternate between different foods rapidly",
+                            "Talk continuously while feeding"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "The correct feeding technique is to feed at the patient's preferred pace with small bites, allowing time for chewing and swallowing between bites."
+                    },
+                    {
+                        question: "What does a pureed diet consist of?",
+                        options: [
+                            "Regular foods with extra seasoning",
+                            "Foods that are chopped into small pieces",
+                            "Foods that are blended to a smooth, uniform consistency",
+                            "Only liquid foods"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "A pureed diet consists of foods that are blended to a smooth, uniform consistency, similar to pudding, for patients who have difficulty chewing or swallowing."
+                    },
+                    {
+                        question: "How should you verify that a patient has swallowed?",
+                        options: [
+                            "Ask them if they're done",
+                            "Watch for throat movement and listen for swallowing sounds",
+                            "Wait 10 seconds then offer more food",
+                            "Check their mouth with a spoon"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "To verify that a patient has swallowed, you should watch for throat movement and listen for swallowing sounds. You can also gently touch the throat to feel the swallow."
+                    }
+                ],
+                clinicalTips: "Never rush a patient who has difficulty swallowing. Maintain eye contact and be attentive to non-verbal cues. Record intake accurately as it's important for monitoring nutrition and hydration.",
+                competencySkills: ["Feeding techniques", "Diet modification knowledge", "Swallowing precautions", "Intake monitoring"]
+            },
+            9: {
+                title: "Therapeutic Communication",
+                competency: "Communication & Ethics",
+                duration: "14 min",
+                badge: "badge-communication",
+                concept: "Effective communication builds trust, reduces anxiety, and improves patient outcomes. Therapeutic communication techniques are essential skills for all healthcare providers.",
+                scenario: "Mrs. Reynolds, a newly admitted patient with dementia, is agitated and calling out for her late husband. She's refusing care and seems frightened.",
+                scriptedAnswer: "I would approach Mrs. Reynolds calmly, introduce myself, and speak in a gentle, reassuring tone. I'd validate her feelings by acknowledging her concern about her husband without arguing about reality. I'd use distraction techniques, offer simple choices, and try to build trust before attempting care. I'd maintain eye contact at her level and use non-threatening body language.",
+                quizQuestions: [
+                    {
+                        question: "Which technique is most effective when communicating with a confused patient?",
+                        options: [
+                            "Speak loudly and use complex sentences",
+                            "Use simple sentences and speak slowly",
+                            "Correct them when they say something incorrect",
+                            "Avoid eye contact to reduce agitation"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "When communicating with confused patients, use simple sentences and speak slowly. This helps them process information more effectively and reduces confusion."
+                    },
+                    {
+                        question: "What is active listening?",
+                        options: [
+                            "Thinking about your response while the patient speaks",
+                            "Fully concentrating on what is being said rather than just hearing",
+                            "Taking notes while the patient speaks",
+                            "Interrupting to ask clarifying questions"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Active listening is fully concentrating on what is being said rather than just passively hearing. It involves paying attention to verbal and non-verbal cues."
+                    },
+                    {
+                        question: "How should you position yourself when communicating with a patient in bed?",
+                        options: [
+                            "Stand above them looking down",
+                            "Sit at eye level",
+                            "Stand with your back to them",
+                            "Sit behind them"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "When communicating with a patient in bed, you should sit at eye level. This shows respect and allows for better eye contact and non-verbal communication."
+                    },
+                    {
+                        question: "What is the most appropriate response when a patient expresses anger?",
+                        options: [
+                            "Tell them not to be angry",
+                            "Acknowledge their feelings and explore the cause",
+                            "Change the subject immediately",
+                            "Leave the room until they calm down"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "When a patient expresses anger, the most appropriate response is to acknowledge their feelings and explore the cause. This validates their emotions and helps address the underlying issue."
+                    },
+                    {
+                        question: "Which communication technique involves restating what the patient has said in your own words?",
+                        options: [
+                            "Directing",
+                            "Reflecting",
+                            "Interpreting",
+                            "Informing"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "Reflecting is a communication technique that involves restating what the patient has said in your own words to show understanding and encourage further communication."
+                    }
+                ],
+                clinicalTips: "Be aware of your own non-verbal communication. Facial expressions, body language, and tone of voice often convey more than words. Always introduce yourself and explain procedures before beginning.",
+                competencySkills: ["Active listening", "Non-verbal communication", "Cultural competence", "Conflict resolution"]
+            },
+            10: {
+                title: "Patient Rights & Privacy",
+                competency: "Communication & Ethics",
+                duration: "13 min",
+                badge: "badge-communication",
+                concept: "Protecting patient rights and privacy is both an ethical and legal obligation. Understanding HIPAA regulations and patient rights is essential for all healthcare workers.",
+                scenario: "A visitor asks you for information about another patient's condition, claiming to be a relative. You recognize this person but aren't certain of their relationship to the patient.",
+                scriptedAnswer: "I would politely explain that I cannot provide any patient information without proper authorization. I'd direct them to the nurse's station where they can verify their relationship and obtain information through proper channels. I would not confirm or deny that the patient is even in our facility without verification.",
+                quizQuestions: [
+                    {
+                        question: "What does HIPAA primarily protect?",
+                        options: [
+                            "Healthcare worker rights",
+                            "Patient health information",
+                            "Hospital property",
+                            "Medicare reimbursement"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "HIPAA (Health Insurance Portability and Accountability Act) primarily protects patient health information (PHI) and sets standards for privacy and security."
+                    },
+                    {
+                        question: "Which of the following is a violation of patient privacy?",
+                        options: [
+                            "Discussing patient care in a private conference room",
+                            "Sharing patient information only with authorized staff",
+                            "Talking about patients in the elevator where others can hear",
+                            "Using passwords for computer access"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Talking about patients in the elevator where others can hear is a violation of patient privacy. Patient care discussions should only occur in private settings."
+                    },
+                    {
+                        question: "What is the proper response when a patient refuses treatment?",
+                        options: [
+                            "Force the treatment for their own good",
+                            "Explain the consequences but respect their decision",
+                            "Ignore their refusal and proceed",
+                            "Tell them they must sign a release form"
+                        ],
+                        correctAnswer: 1,
+                        explanation: "When a patient refuses treatment, you should explain the consequences but respect their decision. Patients have the right to refuse treatment as part of their autonomy."
+                    },
+                    {
+                        question: "How should you handle a patient's medical records?",
+                        options: [
+                            "Leave them at the nurses' station for anyone to see",
+                            "Share them with the patient's family without permission",
+                            "Keep them secure and only share with authorized personnel",
+                            "Dispose of them in regular trash when no longer needed"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "Patient medical records should be kept secure and only shared with authorized personnel. They must be properly disposed of (shredded) when no longer needed."
+                    },
+                    {
+                        question: "What is included in a patient's bill of rights?",
+                        options: [
+                            "Right to choose their roommates",
+                            "Right to free healthcare",
+                            "Right to privacy, respectful care, and participation in treatment decisions",
+                            "Right to demand specific medications"
+                        ],
+                        correctAnswer: 2,
+                        explanation: "A patient's bill of rights typically includes the right to privacy, respectful care, participation in treatment decisions, and other fundamental rights that ensure dignity and autonomy."
+                    }
+                ],
+                clinicalTips: "Never discuss patients in public areas like elevators or cafeterias. Be cautious with social media - never post anything about patients or your workplace. Password-protect your devices and log out of computer systems when not in use.",
+                competencySkills: ["HIPAA compliance", "Confidentiality maintenance", "Patient advocacy", "Ethical decision-making"]
+            }
+        };
+        
+        // Skills checklist data
+        const skillsChecklist = [
+            { id: 1, name: "Hand Hygiene", category: "Infection Control", completed: false },
+            { id: 2, name: "Vital Signs Measurement", category: "Assessment", completed: false },
+            { id: 3, name: "Patient Transfer (Bed to Chair)", category: "Mobility", completed: false },
+            { id: 4, name: "Patient Positioning", category: "Comfort Care", completed: false },
+            { id: 5, name: "Bed Bath", category: "Personal Care", completed: false },
+            { id: 6, name: "Oral Care", category: "Personal Care", completed: false },
+            { id: 7, name: "Dressing Assistance", category: "Personal Care", completed: false },
+            { id: 8, name: "Feeding Assistance", category: "Personal Care", completed: false },
+            { id: 9, name: "Catheter Care", category: "Elimination", completed: false },
+            { id: 10, name: "Perineal Care", category: "Elimination", completed: false },
+            { id: 11, name: "Therapeutic Communication", category: "Communication", completed: false },
+            { id: 12, name: "Patient Privacy Protection", category: "Ethics", completed: false }
+        ];
+        
+        // Study guides data
+        const studyGuides = [
+            { id: 1, title: "CNA Exam Overview", description: "Complete guide to the CNA certification exam format and content" },
+            { id: 2, title: "Vital Signs Reference", description: "Normal ranges and abnormal findings for all vital signs" },
+            { id: 3, title: "Infection Control Procedures", description: "Step-by-step guide to infection control protocols" },
+            { id: 4, title: "Patient Rights Summary", description: "Key patient rights and ethical considerations" },
+            { id: 5, title: "Emergency Procedures", description: "What to do in common healthcare emergencies" },
+            { id: 6, title: "Documentation Guidelines", description: "Proper documentation techniques for CNAs" }
+        ];
+        
+        // Practice exam questions
+        const practiceExamQuestions = [
+            {
+                question: "What is the most important action to prevent the spread of infection?",
+                options: [
+                    "Wearing gloves",
+                    "Hand hygiene",
+                    "Wearing a mask",
+                    "Using disinfectant wipes"
+                ],
+                correctAnswer: 1,
+                explanation: "Hand hygiene is the single most important action to prevent the spread of infection in healthcare settings."
+            },
+            {
+                question: "When should you report a patient's vital signs to the nurse?",
+                options: [
+                    "Only when they are abnormal",
+                    "After every measurement",
+                    "When the patient requests it",
+                    "Only at the end of your shift"
+                ],
+                correctAnswer: 0,
+                explanation: "Vital signs should be reported to the nurse when they are abnormal or significantly different from the patient's baseline."
+            },
+            {
+                question: "What is the correct way to measure blood pressure?",
+                options: [
+                    "With the patient's arm above heart level",
+                    "With the patient's arm at heart level",
+                    "With the patient standing up",
+                    "With the patient lying flat"
+                ],
+                correctAnswer: 1,
+                explanation: "Blood pressure should be measured with the patient's arm at heart level for the most accurate reading."
+            },
+            {
+                question: "How often should a bedridden patient be repositioned?",
+                options: [
+                    "Every 30 minutes",
+                    "Every hour",
+                    "Every 2 hours",
+                    "Every 4 hours"
+                ],
+                correctAnswer: 2,
+                explanation: "Bedridden patients should be repositioned at least every 2 hours to prevent pressure ulcers."
+            },
+            {
+                question: "What is the first step in assisting a patient with a bed bath?",
+                options: [
+                    "Wash the patient's face",
+                    "Check the water temperature",
+                    "Apply soap to the washcloth",
+                    "Remove the patient's gown"
+                ],
+                correctAnswer: 1,
+                explanation: "The first step in assisting with a bed bath is to check the water temperature to ensure it's safe and comfortable for the patient."
+            },
+            {
+                question: "What is the proper technique for perineal care?",
+                options: [
+                    "Wipe from back to front",
+                    "Wipe from front to back",
+                    "Use circular motions",
+                    "Apply alcohol for cleanliness"
+                ],
+                correctAnswer: 1,
+                explanation: "The proper technique for perineal care is to wipe from front to back to prevent contamination of the urethra with bacteria from the anal region."
+            },
+            {
+                question: "When assisting a patient with feeding, what position should they be in?",
+                options: [
+                    "Lying flat in bed",
+                    "Semi-reclined at 30 degrees",
+                    "Upright at 90 degrees",
+                    "Standing at the bedside"
+                ],
+                correctAnswer: 2,
+                explanation: "Patients should be positioned upright at 90 degrees for feeding to facilitate safe swallowing and prevent aspiration."
+            },
+            {
+                question: "What is the most important aspect of therapeutic communication?",
+                options: [
+                    "Speaking loudly and clearly",
+                    "Active listening",
+                    "Using medical terminology",
+                    "Providing advice"
+                ],
+                correctAnswer: 1,
+                explanation: "Active listening is the most important aspect of therapeutic communication as it shows respect and understanding of the patient's concerns."
+            },
+            {
+                question: "What does HIPAA protect?",
+                options: [
+                    "Healthcare worker rights",
+                    "Patient health information",
+                    "Hospital equipment",
+                    "Medicare payments"
+                ],
+                correctAnswer: 1,
+                explanation: "HIPAA protects patient health information and ensures privacy and security of medical records."
+            },
+            {
+                question: "When transferring a patient from bed to wheelchair, what is the first step?",
+                options: [
+                    "Lock the wheelchair brakes",
+                    "Help the patient stand up",
+                    "Position the wheelchair at the foot of the bed",
+                    "Remove the patient's blankets"
+                ],
+                correctAnswer: 0,
+                explanation: "The first step in transferring a patient from bed to wheelchair is to lock the wheelchair brakes to ensure safety."
+            }
+        ];
+        
+        // Global variables
+        let currentUser = null;
+        let currentLesson = null;
+        let currentStep = 'concept';
+        let completedLessons = [];
+        let totalLessons = 10;
+        let quizAnswers = [];
+        let currentQuizQuestion = 0;
+        let practiceExamAnswers = [];
+        let currentPracticeQuestion = 0;
+        let practiceExamTimer = null;
+        let practiceExamTimeLeft = 1800; // 30 minutes in seconds
+        
+        // Initialize app
+        function initializeApp() {
+            // Load custom lessons data if available
+            try {
+                const savedLessons = localStorage.getItem('cnaLessonsData');
+                if (savedLessons) {
+                    const parsedLessons = JSON.parse(savedLessons);
+                    // Merge with default lessons, preserving any custom changes
+                    Object.keys(parsedLessons).forEach(lessonId => {
+                        if (cnaLessons[lessonId]) {
+                            cnaLessons[lessonId] = { ...cnaLessons[lessonId], ...parsedLessons[lessonId] };
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading saved lessons:', error);
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Show login screen
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                
+                // Check for saved sessions after login screen is visible
+                setTimeout(() => {
+                    checkForSavedSessions();
+                }, 100);
+            }, 500);
+        }
+        
+        function checkForSavedSessions() {
+            try {
+                // Check for last logged in student
+                const lastStudent = localStorage.getItem('lastLoggedInStudent');
+                if (lastStudent) {
+                    const savedStudent = localStorage.getItem(`cnaStudent_${lastStudent}`);
+                    if (savedStudent) {
+                        const studentData = JSON.parse(savedStudent);
+                        
+                        // Pre-fill the login form
+                        document.getElementById('studentName').value = studentData.name;
+                        document.getElementById('studentProgram').value = studentData.program;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking saved sessions:', error);
+            }
+        }
+        
+        function setupEventListeners() {
+            // Login tabs
+            document.getElementById('studentTab').addEventListener('click', () => switchTab('student'));
+            document.getElementById('instructorTab').addEventListener('click', () => switchTab('instructor'));
+            
+            // Login button
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        }
+        
+        function switchTab(type) {
+            const studentTab = document.getElementById('studentTab');
+            const instructorTab = document.getElementById('instructorTab');
+            const studentForm = document.getElementById('studentForm');
+            const instructorForm = document.getElementById('instructorForm');
+            
+            if (type === 'student') {
+                studentTab.className = 'flex-1 py-2 px-4 rounded-md bg-white shadow-sm text-green-600';
+                instructorTab.className = 'flex-1 py-2 px-4 rounded-md text-gray-600';
+                studentForm.classList.remove('hidden');
+                instructorForm.classList.add('hidden');
+            } else {
+                instructorTab.className = 'flex-1 py-2 px-4 rounded-md bg-white shadow-sm text-green-600';
+                studentTab.className = 'flex-1 py-2 px-4 rounded-md text-gray-600';
+                instructorForm.classList.remove('hidden');
+                studentForm.classList.add('hidden');
+            }
+        }
+        
+        function handleLogin() {
+            try {
+                const studentName = document.getElementById('studentName').value.trim();
+                const studentProgram = document.getElementById('studentProgram').value;
+                const instructorCode = document.getElementById('instructorCode').value;
+                
+                if (studentName && !document.getElementById('studentForm').classList.contains('hidden')) {
+                    // Student login - load progress
+                    const savedStudent = localStorage.getItem(`cnaStudent_${studentName}`);
+                    if (savedStudent) {
+                        const studentData = JSON.parse(savedStudent);
+                        currentUser = { 
+                            type: 'student', 
+                            name: studentName, 
+                            program: studentProgram,
+                            loginTime: new Date().toISOString()
+                        };
+                        completedLessons = studentData.completedLessons || [];
+                    } else {
+                        currentUser = { 
+                            type: 'student', 
+                            name: studentName, 
+                            program: studentProgram,
+                            loginTime: new Date().toISOString()
+                        };
+                        completedLessons = [];
+                    }
+                    
+                    // Save as last logged in student
+                    localStorage.setItem('lastLoggedInStudent', studentName);
+                    saveProgress();
+                    showStudentDashboard();
+                } else if (instructorCode === 'instructor123') {
+                    // Instructor login
+                    currentUser = { 
+                        type: 'instructor', 
+                        name: 'Instructor',
+                        loginTime: new Date().toISOString()
+                    };
+                    saveProgress();
+                    showInstructorDashboard();
+                } else {
+                    showNotification('Please enter valid credentials', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('An error occurred during login', 'error');
+            }
+        }
+        
+        function handleLogout() {
+            try {
+                // Clear current user
+                const userType = currentUser ? currentUser.type : null;
+                
+                currentUser = null;
+                completedLessons = [];
+                
+                // Clear saved session
+                if (userType === 'instructor') {
+                    localStorage.removeItem('instructorSession');
+                }
+                
+                // Reset form fields
+                document.getElementById('studentName').value = '';
+                document.getElementById('instructorCode').value = '';
+                
+                // Show login screen
+                hideAllScreens();
+                document.getElementById('loginScreen').classList.remove('hidden');
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        function hideAllScreens() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('navigation').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.add('hidden');
+            document.getElementById('instructorDashboard').classList.add('hidden');
+            document.getElementById('lessonView').classList.add('hidden');
+        }
+        
+        function showStudentDashboard() {
+            hideAllScreens();
+            document.getElementById('navigation').classList.remove('hidden');
+            document.getElementById('studentDashboard').classList.remove('hidden');
+            document.getElementById('userInfo').textContent = `${currentUser.name} (${currentUser.program})`;
+            updateProgress();
+        }
+        
+        function showInstructorDashboard() {
+            hideAllScreens();
+            document.getElementById('navigation').classList.remove('hidden');
+            document.getElementById('instructorDashboard').classList.remove('hidden');
+            document.getElementById('userInfo').textContent = `${currentUser.name} (Instructor)`;
+            updateInstructorDashboard();
+        }
+        
+        function updateProgress() {
+            const completed = completedLessons.length;
+            const percentage = Math.round((completed / totalLessons) * 100);
+            
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('completionRate').textContent = percentage + '%';
+            document.getElementById('progressPercent').textContent = percentage + '%';
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('skillsCount').textContent = Math.floor(completed * 0.8);
+            document.getElementById('examReady').textContent = completed >= 8 ? 'Yes' : 'No';
+            document.getElementById('examReady').className = completed >= 8 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
+            
+            // Update lesson checkmarks
+            completedLessons.forEach(lessonId => {
+                const checkmark = document.getElementById(`lesson${lessonId}-check`);
+                if (checkmark) {
+                    checkmark.classList.remove('hidden');
+                }
+            });
+        }
+        
+        function updateInstructorDashboard() {
+            try {
+                // Load all students from localStorage
+                const allStudents = getAllStudents();
+                const totalStudents = allStudents.length;
+                
+                // Calculate average completion
+                let totalCompletion = 0;
+                allStudents.forEach(student => {
+                    totalCompletion += (student.completedLessons.length / totalLessons) * 100;
+                });
+                const avgCompletion = totalStudents > 0 ? Math.round(totalCompletion / totalStudents) : 0;
+                
+                // Calculate pass rate (students with 80% or more completion)
+                const passedStudents = allStudents.filter(student => 
+                    (student.completedLessons.length / totalLessons) >= 0.8
+                ).length;
+                const passRate = totalStudents > 0 ? Math.round((passedStudents / totalStudents) * 100) : 0;
+                
+                // Update dashboard
+                document.getElementById('totalStudents').textContent = totalStudents;
+                document.getElementById('avgCompletion').textContent = avgCompletion + '%';
+                document.getElementById('passRate').textContent = passRate + '%';
+            } catch (error) {
+                console.error('Error updating instructor dashboard:', error);
+            }
+        }
+        
+        function getAllStudents() {
+            const students = [];
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('cnaStudent_')) {
+                        const studentData = JSON.parse(localStorage.getItem(key));
+                        students.push(studentData);
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting all students:', error);
+            }
+            return students;
+        }
+        
+        function startLesson(lessonId) {
+            if (!cnaLessons[lessonId]) {
+                showNotification('This lesson is not yet available.', 'warning');
+                return;
+            }
+            
+            // Reset current step to concept when starting a new lesson
+            currentLesson = lessonId;
+            currentStep = 'concept';
+            quizAnswers = [];
+            currentQuizQuestion = 0;
+            
+            hideAllScreens();
+            document.getElementById('navigation').classList.remove('hidden');
+            document.getElementById('lessonView').classList.remove('hidden');
+            
+            const lesson = cnaLessons[lessonId];
+            document.getElementById('lessonTitle').textContent = lesson.title;
+            document.getElementById('lessonBadge').textContent = lesson.competency;
+            document.getElementById('lessonBadge').className = `competency-badge ${lesson.badge}`;
+            document.getElementById('lessonDuration').textContent = lesson.duration;
+            
+            showLessonStep();
+        }
+        
+        function closeLesson() {
+            currentLesson = null;
+            showStudentDashboard();
+        }
+        
+        function showLessonStep() {
+            const lesson = cnaLessons[currentLesson];
+            const content = document.getElementById('lessonContent');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            // Reset next button display
+            nextBtn.style.display = 'inline-block';
+            
+            if (currentStep === 'concept') {
+                content.innerHTML = `
+                    <div class="bg-blue-50 p-6 rounded-lg mb-6">
+                        <h3 class="text-lg font-semibold text-blue-900 mb-3">🎯 Learning Objective</h3>
+                        <p class="text-blue-800 mb-4">${lesson.concept}</p>
+                        <div class="bg-white p-4 rounded-lg mt-4">
+                            <h4 class="font-semibold text-blue-900 mb-2">Key Competency Skills:</h4>
+                            <ul class="list-disc list-inside text-blue-800 space-y-1">
+                                ${lesson.competencySkills.map(skill => `<li>${skill}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                nextBtn.textContent = 'Continue to Clinical Scenario';
+            } 
+            else if (currentStep === 'scenario') {
+                content.innerHTML = `
+                    <div class="bg-yellow-50 p-6 rounded-lg mb-6">
+                        <h3 class="text-lg font-semibold text-yellow-900 mb-3">🏥 Clinical Scenario</h3>
+                        <p class="text-yellow-800 mb-4">${lesson.scenario}</p>
+                        <div class="bg-yellow-100 p-4 rounded-lg">
+                            <p class="text-yellow-700 font-medium">As a CNA, how would you handle this situation step-by-step?</p>
+                        </div>
+                    </div>
+                    <button onclick="showAnswer()" class="btn btn-success mb-6">💡 Show Best Practice Response</button>
+                    <div id="modelAnswer" class="hidden bg-green-50 p-6 rounded-lg mb-6">
+                        <h4 class="text-lg font-semibold text-green-900 mb-3">✅ Best Practice Response</h4>
+                        <p class="text-green-800 mb-4">${lesson.scriptedAnswer}</p>
+                        <div class="bg-green-100 p-4 rounded-lg">
+                            <h5 class="font-semibold text-green-900 mb-2">💡 Clinical Tips:</h5>
+                            <p class="text-green-800">${lesson.clinicalTips}</p>
+                        </div>
+                    </div>
+                `;
+                nextBtn.textContent = 'Continue to Knowledge Check';
+                nextBtn.style.display = 'none';
+            }
+            else if (currentStep === 'quiz') {
+                displayQuizQuestion();
+                nextBtn.style.display = 'none';
+            }
+            else if (currentStep === 'complete') {
+                // Calculate quiz score
+                const correctAnswers = quizAnswers.filter(answer => answer.isCorrect).length;
+                const totalQuestions = quizAnswers.length;
+                const scorePercentage = Math.round((correctAnswers / totalQuestions) * 100);
+                
+                content.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-green-500 text-6xl mb-4">🏆</div>
+                        <h3 class="text-2xl font-bold text-green-700 mb-2">Competency Achieved!</h3>
+                        <p class="text-gray-600 mb-4">You've successfully completed "${lesson.title}"</p>
+                        <div class="bg-green-50 p-4 rounded-lg mb-6 max-w-md mx-auto">
+                            <div class="text-sm text-green-700">
+                                <p><strong>Competency Area:</strong> ${lesson.competency}</p>
+                                <p><strong>Skills Mastered:</strong> ${lesson.competencySkills.length}</p>
+                                <p><strong>Quiz Score:</strong> ${correctAnswers}/${totalQuestions} (${scorePercentage}%)</p>
+                                <p><strong>Time Completed:</strong> ${new Date().toLocaleTimeString()}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 justify-center">
+                            <button onclick="completeLesson()" class="btn btn-success">Return to Dashboard</button>
+                            <button onclick="nextRecommendedLesson()" class="btn btn-primary">Next Recommended Lesson</button>
+                        </div>
+                    </div>
+                `;
+                nextBtn.style.display = 'none';
+            }
+            
+            // Scroll to top of lesson content
+            window.scrollTo(0, 0);
+        }
+        
+        function displayQuizQuestion() {
+            const lesson = cnaLessons[currentLesson];
+            const content = document.getElementById('lessonContent');
+            const question = lesson.quizQuestions[currentQuizQuestion];
+            
+            content.innerHTML = `
+                <div class="bg-purple-50 p-6 rounded-lg mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-purple-900">Question ${currentQuizQuestion + 1} of ${lesson.quizQuestions.length}</h3>
+                        <span class="text-sm text-purple-700">${Math.round(((currentQuizQuestion) / lesson.quizQuestions.length) * 100)}% Complete</span>
+                    </div>
+                    <p class="text-purple-800 mb-4 font-medium">${question.question}</p>
+                    <div class="space-y-2">
+                        ${question.options.map((option, index) => `
+                            <button class="quiz-option" onclick="selectAnswer(${index})" id="option-${index}">
+                                ${String.fromCharCode(65 + index)}. ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-container"></div>
+                </div>
+                <div class="flex justify-between">
+                    ${currentQuizQuestion > 0 ? `<button onclick="previousQuestion()" class="btn btn-secondary">Previous Question</button>` : '<div></div>'}
+                    <button id="submitAnswerBtn" onclick="submitQuizAnswer()" class="btn btn-primary" disabled>Submit Answer</button>
+                </div>
+            `;
+        }
+        
+        function selectAnswer(optionIndex) {
+            // Remove previous selection
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Mark selected option
+            document.getElementById(`option-${optionIndex}`).classList.add('selected');
+            
+            // Enable submit button
+            document.getElementById('submitAnswerBtn').disabled = false;
+            
+            // Store selected answer
+            window.selectedAnswer = optionIndex;
+        }
+        
+        function submitQuizAnswer() {
+            const lesson = cnaLessons[currentLesson];
+            const question = lesson.quizQuestions[currentQuizQuestion];
+            const isCorrect = window.selectedAnswer === question.correctAnswer;
+            
+            // Store answer
+            quizAnswers.push({
+                questionIndex: currentQuizQuestion,
+                selectedAnswer: window.selectedAnswer,
+                correctAnswer: question.correctAnswer,
+                isCorrect: isCorrect
+            });
+            
+            // Show feedback
+            const feedbackContainer = document.getElementById('feedback-container');
+            feedbackContainer.innerHTML = `
+                <div class="quiz-feedback ${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">
+                    <p class="font-medium">${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
+                    <p>${question.explanation}</p>
+                </div>
+            `;
+            
+            // Mark options as correct/incorrect
+            document.querySelectorAll('.quiz-option').forEach((option, index) => {
+                if (index === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (index === window.selectedAnswer && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+                option.onclick = null; // Disable further clicking
+            });
+            
+            // Disable submit button
+            document.getElementById('submitAnswerBtn').disabled = true;
+            
+            // Change button to "Next Question" or "Complete Quiz"
+            const submitBtn = document.getElementById('submitAnswerBtn');
+            if (currentQuizQuestion < lesson.quizQuestions.length - 1) {
+                submitBtn.textContent = 'Next Question';
+                submitBtn.disabled = false;
+                submitBtn.onclick = nextQuestion;
+            } else {
+                submitBtn.textContent = 'Complete Quiz';
+                submitBtn.disabled = false;
+                submitBtn.onclick = completeQuiz;
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuizQuestion++;
+            displayQuizQuestion();
+        }
+        
+        function previousQuestion() {
+            if (currentQuizQuestion > 0) {
+                currentQuizQuestion--;
+                displayQuizQuestion();
+            }
+        }
+        
+        function completeQuiz() {
+            currentStep = 'complete';
+            showLessonStep();
+        }
+        
+        function showAnswer() {
+            document.getElementById('modelAnswer').classList.remove('hidden');
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+        
+        function nextStep() {
+            if (currentStep === 'concept') {
+                currentStep = 'scenario';
+            } else if (currentStep === 'scenario') {
+                currentStep = 'quiz';
+            } else if (currentStep === 'quiz') {
+                currentStep = 'complete';
+            }
+            showLessonStep();
+        }
+        
+        function completeLesson() {
+            if (!completedLessons.includes(currentLesson)) {
+                completedLessons.push(currentLesson);
+                saveProgress();
+                showNotification(`Lesson "${cnaLessons[currentLesson].title}" completed successfully!`, 'success');
+            }
+            closeLesson();
+        }
+        
+        function nextRecommendedLesson() {
+            // First, make sure the current lesson is marked as completed
+            if (currentLesson && !completedLessons.includes(currentLesson)) {
+                completedLessons.push(currentLesson);
+                saveProgress();
+                showNotification(`Lesson "${cnaLessons[currentLesson].title}" completed successfully!`, 'success');
+            }
+            
+            // Find next uncompleted lesson
+            let nextLessonId = null;
+            
+            // Look for the next lesson in sequential order
+            for (let i = 1; i <= totalLessons; i++) {
+                if (!completedLessons.includes(i)) {
+                    nextLessonId = i;
+                    break;
+                }
+            }
+            
+            // If we found a next lesson, start it
+            if (nextLessonId) {
+                // Close current lesson view first
+                closeLesson();
+                
+                // Small delay to ensure proper state reset before starting next lesson
+                setTimeout(() => {
+                    startLesson(nextLessonId);
+                }, 100);
+            } else {
+                // All lessons are completed
+                closeLesson();
+                
+                // Show completion modal
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg p-8 max-w-md mx-auto">
+                        <div class="text-center">
+                            <div class="text-green-500 text-6xl mb-4">🎉</div>
+                            <h3 class="text-2xl font-bold text-green-700 mb-2">Congratulations!</h3>
+                            <p class="text-gray-600 mb-6">You've completed all CNA training lessons. You're now ready for the certification exam!</p>
+                            <div class="flex gap-4 justify-center">
+                                <button onclick="this.closest('.fixed').remove();" class="btn btn-success">Return to Dashboard</button>
+                                <button onclick="showPracticeExam(); this.closest('.fixed').remove();" class="btn btn-primary">Take Practice Exam</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+        }
+        
+        // Practice Exam Functions
+        function showPracticeExam() {
+            document.getElementById('practiceExamModal').classList.remove('hidden');
+        }
+        
+        function startPracticeExam() {
+            // Reset practice exam variables
+            practiceExamAnswers = [];
+            currentPracticeQuestion = 0;
+            practiceExamTimeLeft = 1800; // 30 minutes
+            
+            // Start timer
+            practiceExamTimer = setInterval(updatePracticeExamTimer, 1000);
+            
+            // Show first question
+            displayPracticeQuestion();
+        }
+        
+        function updatePracticeExamTimer() {
+            practiceExamTimeLeft--;
+            
+            const minutes = Math.floor(practiceExamTimeLeft / 60);
+            const seconds = practiceExamTimeLeft % 60;
+            
+            // Update timer display
+            const timerElement = document.getElementById('practiceExamTimer');
+            if (timerElement) {
+                timerElement.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+            
+            // Check if time is up
+            if (practiceExamTimeLeft <= 0) {
+                clearInterval(practiceExamTimer);
+                completePracticeExam();
+            }
+        }
+        
+        function displayPracticeQuestion() {
+            const content = document.getElementById('practiceExamContent');
+            const question = practiceExamQuestions[currentPracticeQuestion];
+            
+            content.innerHTML = `
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Question ${currentPracticeQuestion + 1} of ${practiceExamQuestions.length}</h3>
+                        <span id="practiceExamTimer" class="text-sm font-medium">Time Remaining: 30:00</span>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <p class="font-medium mb-4">${question.question}</p>
+                        <div class="space-y-2">
+                            ${question.options.map((option, index) => `
+                                <button class="quiz-option" onclick="selectPracticeAnswer(${index})" id="practice-option-${index}">
+                                    ${String.fromCharCode(65 + index)}. ${option}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="practice-feedback-container"></div>
+                    </div>
+                    <div class="flex justify-between">
+                        ${currentPracticeQuestion > 0 ? `<button onclick="previousPracticeQuestion()" class="btn btn-secondary">Previous Question</button>` : '<div></div>'}
+                        <button id="submitPracticeAnswerBtn" onclick="submitPracticeAnswer()" class="btn btn-primary" disabled>Submit Answer</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function selectPracticeAnswer(optionIndex) {
+            // Remove previous selection
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Mark selected option
+            document.getElementById(`practice-option-${optionIndex}`).classList.add('selected');
+            
+            // Enable submit button
+            document.getElementById('submitPracticeAnswerBtn').disabled = false;
+            
+            // Store selected answer
+            window.selectedPracticeAnswer = optionIndex;
+        }
+        
+        function submitPracticeAnswer() {
+            const question = practiceExamQuestions[currentPracticeQuestion];
+            const isCorrect = window.selectedPracticeAnswer === question.correctAnswer;
+            
+            // Store answer
+            practiceExamAnswers.push({
+                questionIndex: currentPracticeQuestion,
+                selectedAnswer: window.selectedPracticeAnswer,
+                correctAnswer: question.correctAnswer,
+                isCorrect: isCorrect
+            });
+            
+            // Show feedback
+            const feedbackContainer = document.getElementById('practice-feedback-container');
+            feedbackContainer.innerHTML = `
+                <div class="quiz-feedback ${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">
+                    <p class="font-medium">${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
+                    <p>${question.explanation}</p>
+                </div>
+            `;
+            
+            // Mark options as correct/incorrect
+            document.querySelectorAll('.quiz-option').forEach((option, index) => {
+                if (index === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (index === window.selectedPracticeAnswer && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+                option.onclick = null; // Disable further clicking
+            });
+            
+            // Disable submit button
+            document.getElementById('submitPracticeAnswerBtn').disabled = true;
+            
+            // Change button to "Next Question" or "Complete Exam"
+            const submitBtn = document.getElementById('submitPracticeAnswerBtn');
+            if (currentPracticeQuestion < practiceExamQuestions.length - 1) {
+                submitBtn.textContent = 'Next Question';
+                submitBtn.disabled = false;
+                submitBtn.onclick = nextPracticeQuestion;
+            } else {
+                submitBtn.textContent = 'Complete Exam';
+                submitBtn.disabled = false;
+                submitBtn.onclick = completePracticeExam;
+            }
+        }
+        
+        function nextPracticeQuestion() {
+            currentPracticeQuestion++;
+            displayPracticeQuestion();
+        }
+        
+        function previousPracticeQuestion() {
+            if (currentPracticeQuestion > 0) {
+                currentPracticeQuestion--;
+                displayPracticeQuestion();
+            }
+        }
+        
+        function completePracticeExam() {
+            // Stop timer
+            clearInterval(practiceExamTimer);
+            
+            // Calculate score
+            const correctAnswers = practiceExamAnswers.filter(answer => answer.isCorrect).length;
+            const totalQuestions = practiceExamAnswers.length;
+            const scorePercentage = Math.round((correctAnswers / totalQuestions) * 100);
+            
+            // Determine pass/fail
+            const passed = scorePercentage >= 70; // 70% to pass
+            
+            // Show results
+            const content = document.getElementById('practiceExamContent');
+            content.innerHTML = `
+                <div class="text-center">
+                    <div class="${passed ? 'text-green-500' : 'text-red-500'} text-6xl mb-4">${passed ? '🎉' : '😢'}</div>
+                    <h3 class="text-2xl font-bold ${passed ? 'text-green-700' : 'text-red-700'} mb-2">${passed ? 'Passed!' : 'Failed'}</h3>
+                    <p class="text-gray-600 mb-4">Your CNA Practice Exam Results</p>
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6 max-w-md mx-auto">
+                        <div class="text-lg mb-4">
+                            <p><strong>Score:</strong> ${correctAnswers}/${totalQuestions} (${scorePercentage}%)</p>
+                            <p><strong>Passing Score:</strong> 70%</p>
+                            <p><strong>Status:</strong> ${passed ? 'PASS' : 'FAIL'}</p>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-600 mb-2">Review these topics for improvement:</p>
+                            <ul class="text-left text-sm text-gray-600">
+                                ${getWeakAreas().map(area => `<li>• ${area}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 justify-center">
+                        <button onclick="closeModal('practiceExamModal')" class="btn btn-success">Close</button>
+                        <button onclick="startPracticeExam()" class="btn btn-primary">Retake Exam</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getWeakAreas() {
+            const weakAreas = [];
+            
+            practiceExamAnswers.forEach((answer, index) => {
+                if (!answer.isCorrect) {
+                    const question = practiceExamQuestions[answer.questionIndex];
+                    weakAreas.push(question.question.substring(0, 30) + '...');
+                }
+            });
+            
+            return weakAreas.slice(0, 3); // Return top 3 weak areas
+        }
+        
+        // Skills Checklist Functions
+        function showSkillsChecklist() {
+            document.getElementById('skillsChecklistModal').classList.remove('hidden');
+            renderSkillsChecklist();
+        }
+        
+        function renderSkillsChecklist() {
+            const skillsList = document.getElementById('skillsList');
+            
+            // Load saved skills completion status
+            const savedSkills = JSON.parse(localStorage.getItem('cnaSkillsChecklist') || '[]');
+            
+            // Update skills checklist with saved status
+            skillsChecklist.forEach(skill => {
+                const savedSkill = savedSkills.find(s => s.id === skill.id);
+                if (savedSkill) {
+                    skill.completed = savedSkill.completed;
+                }
+            });
+            
+            // Group skills by category
+            const skillsByCategory = {};
+            skillsChecklist.forEach(skill => {
+                if (!skillsByCategory[skill.category]) {
+                    skillsByCategory[skill.category] = [];
+                }
+                skillsByCategory[skill.category].push(skill);
+            });
+            
+            // Render skills by category
+            let html = '';
+            for (const category in skillsByCategory) {
+                html += `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">${category}</h3>
+                        <div class="space-y-2">
+                `;
+                
+                skillsByCategory[category].forEach(skill => {
+                    html += `
+                        <div class="skills-checklist-item">
+                            <input type="checkbox" id="skill-${skill.id}" ${skill.completed ? 'checked' : ''} 
+                                onchange="toggleSkill(${skill.id})" class="mr-3">
+                            <label for="skill-${skill.id}" class="flex-1 cursor-pointer">
+                                ${skill.name}
+                            </label>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            skillsList.innerHTML = html;
+        }
+        
+        function toggleSkill(skillId) {
+            const skill = skillsChecklist.find(s => s.id === skillId);
+            if (skill) {
+                skill.completed = !skill.completed;
+                localStorage.setItem('cnaSkillsChecklist', JSON.stringify(skillsChecklist));
+                
+                const status = skill.completed ? 'completed' : 'marked as incomplete';
+                showNotification(`Skill "${skill.name}" ${status}`, 'success');
+            }
+        }
+        
+        // Study Guides Functions
+        function showStudyGuides() {
+            document.getElementById('studyGuidesModal').classList.remove('hidden');
+            renderStudyGuides();
+        }
+        
+        function renderStudyGuides() {
+            const studyGuidesList = document.getElementById('studyGuidesList');
+            
+            let html = '';
+            studyGuides.forEach(guide => {
+                html += `
+                    <div class="study-guide-item" onclick="openStudyGuide(${guide.id})">
+                        <h3 class="text-lg font-semibold text-gray-900">${guide.title}</h3>
+                        <p class="text-gray-600">${guide.description}</p>
+                    </div>
+                `;
+            });
+            
+            studyGuidesList.innerHTML = html;
+        }
+        
+        function openStudyGuide(guideId) {
+            const guide = studyGuides.find(g => g.id === guideId);
+            if (guide) {
+                showNotification(`Opening study guide: ${guide.title}`, 'info');
+                // In a real application, this would open the actual study guide content
+            }
+        }
+        
+        // Instructor Functions
+        function manageLessons() {
+            document.getElementById('manageLessonsModal').classList.remove('hidden');
+            renderLessonsList();
+        }
+        
+        function renderLessonsList() {
+            const lessonsList = document.getElementById('lessonsList');
+            
+            let html = '';
+            for (const lessonId in cnaLessons) {
+                const lesson = cnaLessons[lessonId];
+                html += `
+                    <div class="student-progress-item">
+                        <div class="student-progress-header">
+                            <div>
+                                <div class="student-progress-name">${lesson.title}</div>
+                                <div class="student-progress-program">${lesson.competency} • ${lesson.duration}</div>
+                            </div>
+                            <div>
+                                <button onclick="editLesson(${lessonId})" class="btn btn-primary btn-sm">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            lessonsList.innerHTML = html;
+        }
+        
+        function editLesson(lessonId) {
+            const lesson = cnaLessons[lessonId];
+            if (!lesson) return;
+            
+            // Create edit modal
+            const editModal = document.createElement('div');
+            editModal.className = 'modal';
+            editModal.id = 'editLessonModal';
+            
+            editModal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close-modal" onclick="closeEditModal()">&times;</span>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Edit Lesson: ${lesson.title}</h2>
+                    <form id="editLessonForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonTitle">
+                                Lesson Title
+                            </label>
+                            <input type="text" id="lessonTitleInput" class="input" value="${lesson.title}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonCompetency">
+                                Competency Area
+                            </label>
+                            <select id="lessonCompetencyInput" class="input" required>
+                                <option value="Basic Nursing Skills" ${lesson.competency === 'Basic Nursing Skills' ? 'selected' : ''}>Basic Nursing Skills</option>
+                                <option value="Personal Care Skills" ${lesson.competency === 'Personal Care Skills' ? 'selected' : ''}>Personal Care Skills</option>
+                                <option value="Communication & Ethics" ${lesson.competency === 'Communication & Ethics' ? 'selected' : ''}>Communication & Ethics</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonDuration">
+                                Duration
+                            </label>
+                            <input type="text" id="lessonDurationInput" class="input" value="${lesson.duration}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonConcept">
+                                Learning Concept
+                            </label>
+                            <textarea id="lessonConceptInput" class="input" rows="3" required>${lesson.concept}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonScenario">
+                                Clinical Scenario
+                            </label>
+                            <textarea id="lessonScenarioInput" class="input" rows="3" required>${lesson.scenario}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonScriptedAnswer">
+                                Best Practice Response
+                            </label>
+                            <textarea id="lessonScriptedAnswerInput" class="input" rows="3" required>${lesson.scriptedAnswer}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonClinicalTips">
+                                Clinical Tips
+                            </label>
+                            <textarea id="lessonClinicalTipsInput" class="input" rows="2" required>${lesson.clinicalTips}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                Competency Skills (comma separated)
+                            </label>
+                            <input type="text" id="lessonSkillsInput" class="input" value="${lesson.competencySkills.join(', ')}" required>
+                        </div>
+                        <div class="flex justify-end gap-4">
+                            <button type="button" onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(editModal);
+            
+            // Add form submit handler
+            document.getElementById('editLessonForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveLessonChanges(lessonId);
+            });
+        }
+        
+        function closeEditModal() {
+            const editModal = document.getElementById('editLessonModal');
+            if (editModal) {
+                editModal.remove();
+            }
+        }
+        
+        function saveLessonChanges(lessonId) {
+            try {
+                // Get form values
+                const title = document.getElementById('lessonTitleInput').value;
+                const competency = document.getElementById('lessonCompetencyInput').value;
+                const duration = document.getElementById('lessonDurationInput').value;
+                const concept = document.getElementById('lessonConceptInput').value;
+                const scenario = document.getElementById('lessonScenarioInput').value;
+                const scriptedAnswer = document.getElementById('lessonScriptedAnswerInput').value;
+                const clinicalTips = document.getElementById('lessonClinicalTipsInput').value;
+                const skillsInput = document.getElementById('lessonSkillsInput').value;
+                const competencySkills = skillsInput.split(',').map(skill => skill.trim());
+                
+                // Determine badge based on competency
+                let badge = 'badge-basic';
+                if (competency === 'Personal Care Skills') badge = 'badge-skills';
+                if (competency === 'Communication & Ethics') badge = 'badge-communication';
+                
+                // Update lesson data
+                cnaLessons[lessonId] = {
+                    ...cnaLessons[lessonId],
+                    title,
+                    competency,
+                    duration,
+                    badge,
+                    concept,
+                    scenario,
+                    scriptedAnswer,
+                    clinicalTips,
+                    competencySkills
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('cnaLessonsData', JSON.stringify(cnaLessons));
+                
+                // Close modal
+                closeEditModal();
+                
+                // Refresh lessons list
+                renderLessonsList();
+                
+                // Show success notification
+                showNotification(`Lesson "${title}" updated successfully!`, 'success');
+            } catch (error) {
+                console.error('Error saving lesson changes:', error);
+                showNotification('Error saving lesson changes', 'error');
+            }
+        }
+        
+        function viewReports() {
+            document.getElementById('studentReportsModal').classList.remove('hidden');
+            renderStudentsList();
+        }
+        
+        function renderStudentsList() {
+            const studentsList = document.getElementById('studentsList');
+            const allStudents = getAllStudents();
+            
+            if (allStudents.length === 0) {
+                studentsList.innerHTML = '<p class="text-gray-600">No student data available.</p>';
+                return;
+            }
+            
+            let html = '';
+            allStudents.forEach(student => {
+                const completion = Math.round((student.completedLessons.length / totalLessons) * 100);
+                const examReady = (student.completedLessons.length / totalLessons) >= 0.8 ? 'Yes' : 'No';
+                
+                html += `
+                    <div class="student-progress-item">
+                        <div class="student-progress-header">
+                            <div>
+                                <div class="student-progress-name">${student.name}</div>
+                                <div class="student-progress-program">${student.program}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-medium">${completion}%</div>
+                                <div class="text-sm ${examReady === 'Yes' ? 'text-green-600' : 'text-red-600'}">${examReady}</div>
+                            </div>
+                        </div>
+                        <div class="student-progress-bar">
+                            <div class="student-progress-fill" style="width: ${completion}%"></div>
+                        </div>
+                        <div class="mt-2 text-sm text-gray-600">
+                            Completed: ${student.completedLessons.length}/${totalLessons} lessons
+                        </div>
+                    </div>
+                `;
+            });
+            
+            studentsList.innerHTML = html;
+        }
+        
+        // Modal Functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            
+            // Stop practice exam timer if closing practice exam modal
+            if (modalId === 'practiceExamModal' && practiceExamTimer) {
+                clearInterval(practiceExamTimer);
+            }
+        }
+        
+        // Notification Function
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            // Add close button
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'close-notification';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = function() {
+                notification.remove();
+            };
+            
+            // Add message
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            
+            // Append elements
+            notification.appendChild(closeBtn);
+            notification.appendChild(messageElement);
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        // Data Persistence Functions
+        function saveProgress() {
+            try {
+                if (currentUser && currentUser.type === 'student') {
+                    const studentData = {
+                        ...currentUser,
+                        completedLessons: completedLessons
+                    };
+                    localStorage.setItem(`cnaStudent_${currentUser.name}`, JSON.stringify(studentData));
+                    localStorage.setItem('lastLoggedInStudent', currentUser.name);
+                } else if (currentUser && currentUser.type === 'instructor') {
+                    localStorage.setItem('instructorSession', JSON.stringify(currentUser));
+                }
+            } catch (error) {
+                console.error('Error saving progress:', error);
+            }
+        }
+        
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
